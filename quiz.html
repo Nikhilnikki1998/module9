@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+    <title>Socrative</title>
+    <script>
+        function register() {
+            var Rollno = document.getElementById("Vs2").value;
+            var Name = document.getElementById("Vs1").value;
+            var sub=document.getElementById("subject").value;
+
+            if (localStorage) {
+                localStorage.setItem("name", Name);
+                localStorage.setItem("id", Rollno);
+                localStorage.setItem("subject",sub)
+                localStorage.setItem("correct", "0");
+                localStorage.setItem("total", "0");
+            }
+        }
+    </script>
+    <style>
+    body{
+        background-image: url("bg.jpg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+    }
+    </style>
+
+</head>
+
+<body>
+    <br>
+    <center><h1 style="color: aliceblue;">Socrative</h1></center>
+        <form action="rules.html">
+            <div class="form-row">
+                <div  class="col-md-2 mb-3"></div>
+                <div style="color: aliceblue;" class="col-md-8 mb-3">
+                    <label for="Vs1">Full Name</label>
+                    <input type="text" class="form-control is-valid" id="Vs1" value="" required><br>
+                </div>
+                <br>
+            </div>
+            <div class="form-row">
+                <div class="col-md-2 mb-3"></div>
+                <div style="color: aliceblue;" class="col-md-8 mb-3">
+                    <label for="Vs1">Roll.no</label>
+                    <input type="text" class="form-control is-valid" id="Vs2" value="" required><br>
+                </div>
+                <br>
+            </div>
+            <div class="form-row">
+                <div class="col-md-2 mb-3"></div>
+                <div style="color: aliceblue;" class="col-md-8 mb-3">
+                    <label for="choose">Select a course to continue:</label><br><br>
+                        <select class="selectpicker" data-style="btn-primary" name="choose" id="subject" required>
+                            <option value="">None</option>
+                            <option value="1">Maths</option>
+                            <option value="2">General</option>
+                            
+                        </select>
+                </div>
+            </div>
+            
+
+            <center><input type="submit" onclick="register()"></center>
+        </form>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+</body>
+
+
+</html>

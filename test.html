@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <title>Quiz</title>
+    <style>
+        body{
+            background-image: url("bg1.jpg");
+            background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        }
+        #count {
+            /* align-items: center;
+            text-align: center; */
+            border: #f3d691 3px solid;
+            /* padding: 10px 40px 40px 40px; */
+            background-color: #000000;
+            color: aliceblue;
+            /* width: 25%;
+            margin-left: 37.5%; */
+            font-family:'Courier New', Courier, monospace;
+            font-size: 30px;
+            text-align: center;
+        }
+
+        #test {
+            /* align-items: center;
+            text-align: center; */
+            border: #f3cb80 3px solid;
+            /* padding: 10px 40px 40px 40px; */
+            background-color: #020101;
+            /* width: 50%;
+            margin-left: 25%; */
+            color: aliceblue;
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: 30px;
+        }
+
+        #test_status {
+            /* border: #5AB029 3px solid; */
+            /* padding: 10px 40px 40px 40px; */
+            /* background-color: #E5FCE3; */
+            /* width: 50%;
+            margin-left: 25%; */
+            font-family:Arial, Helvetica, sans-serif;
+            font-size: 30px;
+            text-align: center;
+            color: rgb(230, 255, 7);
+        }
+
+        .button {
+            background-color: rgb(0, 0, 0);
+            color: rgb(255, 253, 251);
+            /* border: 2px solid #0df388; */
+            /* padding: 16px 32px; */
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 30px;
+            font-family: serif;
+            /* margin: 4px 2px; */
+            transition-duration: 0.4s;
+            cursor: pointer;
+        }
+
+
+        .button:hover {
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+        }
+    </style>
+    <!-- <script src="quiz.js"></script> -->
+    <script>
+        var score = 0;
+        // pos is position of where the user in the test or which question they're up to
+        var pos = 0, test, test_status, question, choice, choices, chA, chB, chC, correct = 0, notatt = 0;
+        
+        // this is a multidimensional array with 4 inner array elements with 5 elements inside them
+        var questions = null;
+        var ourRequest = new XMLHttpRequest();
+        var testredirect= localStorage.getItem("re");
+        ourRequest.open('GET', testredirect);
+
+        ourRequest.onload = function () {
+            questions = JSON.parse(ourRequest.responseText);
+            console.log(questions[0]);
+        };
+        ourRequest.send();
+        // this get function is short for the getElementById function  
+        function get(x) {
+            return document.getElementById(x);
+        }
+        // this function renders a question for display on the page
+        var count = 20;
+        var interval = setInterval(function () {
+            document.getElementById('count').innerHTML = "Remaining time:" + count;
+            count--;
+            if (count === 0) {
+                // clearInterval(interval);
+                // document.getElementById('count').innerHTML = 'Done';
+                // or...
+                alert("You ran out of time! \n Attempt the next question please");
+                localStorage.setItem(pos,"NOT SELECTED");
+                notatt++;
+                count = 15;
+                pos++;
+                renderQuestion();
+            }
+        }, 1000);
+        function renderQuestion() {
+
+            test = get("test");
+            if (pos >= questions.length) {
+                // test.innerHTML = "<h2>You got " + correct + " of " + questions.length + " questions correct</h2>";
+                score = correct
+                register();
+                clearInterval(interval);
+                document.getElementById('count').innerHTML = 'Done';
+                get("test_status").innerHTML = "Test completed";
+                test.innerHTML = '<center><a class="button" href="results.html" role="button"><b>View Results</b></a></center>';
+                // test.innerHTML = "<center><button type='submit'> <a href='quiz.html'>view results</a></button></center>";
+                // resets the variable to allow users to restart the test
+                pos = 0;
+                correct = 0;
+                // stops rest of renderQuestion function running when test is completed
+                return false;
+            }
+            get("test_status").innerHTML = "Question " + (pos + 1) + " of " + questions.length;
+
+            question = questions[pos].question;
+            chA = questions[pos].a;
+            chB = questions[pos].b;
+            chC = questions[pos].c;
+            // display the question
+            test.innerHTML = "<h3>" + question + "</h3>";
+            // display the answer options
+            // the += appends to the data we started on the line above
+            test.innerHTML += "<label> <input type='radio' name='choices' value='A'> " + chA + "</label><br>";
+            test.innerHTML += "<label> <input type='radio' name='choices' value='B'> " + chB + "</label><br>";
+            test.innerHTML += "<label> <input type='radio' name='choices' value='C'> " + chC + "</label><br><br>";
+            test.innerHTML += "<button onclick='checkAnswer()'>Proceed</button>";
+        }
+        function checkAnswer() {
+            // use getElementsByName because we have an array which it will loop through
+            var getSelectedValue = document.querySelector('input[name="choices"]:checked');
+            if (getSelectedValue != null) {
+                // alert("Radio button is selected" + getSelectedValue);
+                choices = document.getElementsByName("choices");
+                for (var i = 0; i < choices.length; i++) {
+                    if (choices[i].checked) {
+                        choice = choices[i].value;
+                    }
+                }
+                // checks if answer matches the correct choice
+                if (choice == questions[pos].answer) {
+                    //each time there is a correct answer this value increases
+                    correct++;
+                }
+                // changes position of which character user is on
+                if (localStorage) {
+                    localStorage.setItem(pos,choice);
+                    // alert(localStorage.getItem(pos));
+                }
+                pos++;
+                // clearInterval(interval);
+                count = 20;
+                // then the renderQuestion function runs again to go to next question
+                renderQuestion();
+            }
+            else {
+                alert("Please select an option to Proceed");
+            }
+
+        }
+        // Add event listener to call renderQuestion on page load event
+        window.addEventListener("load", renderQuestion);
+        function register() {
+            if (localStorage) {
+                localStorage.setItem("score", score);
+                localStorage.setItem("totalques", questions.length);
+                localStorage.setItem("unattempted", notatt);
+                // var y=localStorage.getItem("totalques");
+                // alert(y);
+            }
+        }
+
+
+    </script>
+</head>
+
+<body>
+    <br><br><br><br><br><br><br><br><br><br>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3"></div>
+            <div class="col-md-6">
+                <h2 id="test_status"></h2>
+                <h2 id="count"></h2>
+                <div id="test"></div>
+            </div>
+            <div class="col-md-3"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+        crossorigin="anonymous"></script>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+</body>
+
+</html>
